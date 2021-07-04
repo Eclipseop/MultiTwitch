@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import MultiChat from '../components/MultiChat';
 
 const generateStreamUrl = (name: string): string => {
     return `https://player.twitch.tv/?channel=${name}&parent=localhost`
 }
 
-const generateChatUrl = (name: string): string => {
+export const generateChatUrl = (name: string): string => {
     return `https://www.twitch.tv/embed/${name}/chat?darkpopout&parent=localhost`
 }
 
@@ -21,10 +22,15 @@ const Streams = () => {
     if (!Array.isArray(users)) {
         users = [users];
     }
+    const len = users.length;
 
     return (
         <div className="">
-            <button className="absolute text-white" onClick={() => setShowChat(!showChat)}>Toggle Chat</button>
+            {
+                len <= 2 ?
+                    <button className="absolute text-white" onClick={() => setShowChat(!showChat)}>Toggle Chat</button> :
+                    null
+            }
             <div className="grid grid-cols-2 grid-flow-row h-screen w-screen">
                 {
                     users.map((u) =>
@@ -34,10 +40,10 @@ const Streams = () => {
                                 frameBorder="0"
                                 allowFullScreen={true}
                                 scrolling="no"
-                                className={`w-full ${showChat ? 'h-1/2' : 'h-full'}`}
+                                className={`w-full ${showChat && len <= 2 ? 'h-1/2' : 'h-full'}`}
                             />
                             {
-                                showChat ?
+                                showChat && len <= 2 ?
                                     <iframe
                                         id="chat_embed"
                                         src={generateChatUrl(u)}
@@ -48,6 +54,9 @@ const Streams = () => {
                         </div>
                     )
                 }
+                {len > 2 ?
+                    <MultiChat users={users} /> :
+                    null}
             </div>
         </div>
     )
